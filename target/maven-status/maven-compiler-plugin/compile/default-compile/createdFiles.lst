@@ -1,8 +1,0 @@
-net\highersoft\mstats\interceptor\ActionMethodInterceptor.class
-net\highersoft\mstats\util\ListMapConverter.class
-net\highersoft\mstats\dao\VisitorDataDao.class
-net\highersoft\mstats\service\ActionMethodService.class
-net\highersoft\mstats\model\VisitorData.class
-net\highersoft\mstats\service\VisitorDataProcessor.class
-net\highersoft\mstats\interceptor\IPinService.class
-net\highersoft\mstats\dao\VisitorDataDao$1.class
