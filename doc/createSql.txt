@@ -1,0 +1,31 @@
+CREATE TABLE `visitor_data` (
+	`id` INT(10) NOT NULL AUTO_INCREMENT COMMENT '主键',
+	`sys_id` INT(10) NULL DEFAULT NULL COMMENT '系统标识ID',
+	`menu_path` VARCHAR(500) NULL DEFAULT NULL COMMENT '访问路径',
+	`erp_id` VARCHAR(100) NULL DEFAULT NULL COMMENT '用户账号',
+	`create_time` DATETIME NULL DEFAULT NULL COMMENT '创建时间',
+	`create_date` INT(11) NULL DEFAULT NULL COMMENT '创建日期yyyyMMdd',
+	`create_hour` INT(11) NULL DEFAULT NULL COMMENT '创建小时HH',
+	`path_type` INT(10) NULL DEFAULT NULL COMMENT '路径类型',
+	PRIMARY KEY (`id`),
+	INDEX `downloadstatis` (`sys_id`, `path_type`, `create_date`)
+)
+COMMENT='Action方法访问记录'
+COLLATE='utf8_general_ci'
+ENGINE=InnoDB;
+
+CREATE TABLE `visitor_system` (
+	`id` INT(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
+	`system_id` INT(11) NULL DEFAULT NULL COMMENT '系统ID',
+	`system_name` VARCHAR(50) NULL DEFAULT NULL COMMENT '系统名称',
+	`path` VARCHAR(500) NULL DEFAULT NULL COMMENT '路径',
+	`path_name` VARCHAR(50) NULL DEFAULT NULL COMMENT '路径功能名',
+	`path_type` INT(11) NULL DEFAULT NULL COMMENT '路径类型',
+	`create_time` TIMESTAMP NULL DEFAULT NULL COMMENT '创建时间',
+	`update_time` TIMESTAMP NULL DEFAULT NULL COMMENT '更新时间',
+	`updator` VARCHAR(50) NULL DEFAULT NULL COMMENT '更新者',
+	PRIMARY KEY (`id`)
+)
+COMMENT='访问记录系统配置信息'
+COLLATE='utf8_general_ci'
+ENGINE=InnoDB;

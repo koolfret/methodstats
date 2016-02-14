@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:aop="http://www.springframework.org/schema/aop"
+	   xmlns:tx="http://www.springframework.org/schema/tx"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd" 
+           default-autowire="byName" default-lazy-init="false">
+	
+	<bean id="visitorDataProcessor" class="net.highersoft.mstats.service.VisitorDataProcessor">
+		<property name="mstatsService" ref="mstatsService"></property>
+		<property name="defTime" value="60000"></property>
+	</bean>
+    <bean id="visitorDatas" class="java.util.concurrent.ArrayBlockingQueue">
+        <constructor-arg value="10000"/>
+    </bean>
+    
+    <bean id="visitorDataDao" class="net.highersoft.mstats.dao.VisitorDataDao">
+        <property name="jdbcTemplate" ref="mstats_jdbcTemplate" />
+    </bean>
+    <bean id="mstats_jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="mstats_tgtDataSource" />
+	</bean>
+	<bean  class="net.highersoft.mstats.servlet.MethodStatisAction">
+    	<property name="mstatsService" ref="mstatsService"></property>
+    </bean>
+    
+    
+    <!-- 以下系统使用者配置 -->
+    <bean class="net.highersoft.mstats.interceptor.ActionMethodInterceptor">       
+        <property name="mstatsService" ref="mstatsService"></property>
+        <property name="pinService" ref="pinService"></property>
+    </bean>
+    
+    <bean id="pinService" class="net.highersoft.mstats.interceptor.DefaultPinServiceImpl"></bean>
+    
+    <bean id="mstatsService" class="net.highersoft.mstats.service.ActionMethodService">
+    	<!--recordAll true记录全部，false只记录下面配置的  -->
+    	<property name="recordAll" value="false"/>
+    	<!-- 
+    	<property name="sysId" value="1"/>
+     	<property name="sysName" value="HigherSoft"/>
+     	 -->
+    	<property name="visitorDataDao" ref="visitorDataDao"></property>
+    	<property name="visitorDatas" ref="visitorDatas"></property>
+    	<property name="pathInfo">	    	
+			<map>
+				<entry key="/methodstatis/GameAction!personalIncome.action" value="个人所得税"></entry>
+			</map> 
+    	</property>
+    </bean>
+    
+    <!-- 目标数据源配置 正式环境中可去掉，然后注入真实的目标数据库 -->
+	<bean id="mstats_tgtDataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="org.sqlite.JDBC" />
+		<property name="url" >
+		<value><![CDATA[jdbc:sqlite:${sqlite.path}]]></value>
+		</property>
+	</bean>
+    
+	
+</beans>
