@@ -20,10 +20,10 @@ public class ConfigService {
 			dbPath.mkdirs();	
 			if(!configFile.exists()){
 				configFile.createNewFile();
-				PrintWriter pw=new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(configFile),"UTF-8")));
-				pw.println("db="+dbPath+File.separator+"highersort.db");
-				pw.close();
-				File db=new File(dbPath+File.separator+"highersort.db");
+				/*PrintWriter pw=new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(configFile),"UTF-8")));
+				pw.println("db="+dbPath+File.separator+"highersoft.db");
+				pw.close();*/
+				File db=new File(dbPath+File.separator+"highersoft.db");
 				if(!db.exists()){
 					db.createNewFile();
 				}
@@ -32,25 +32,29 @@ public class ConfigService {
 		}
 		return null;
 	}
-	public static boolean checkConfig(boolean initFlag,String parentPath) {		
+	/**
+	 * 
+	 * @param parentPath
+	 * @return 是否执行了初始化
+	 */
+	public static boolean checkConfig(String parentPath) {		
 		File configFile=new File(getConfigPath(parentPath));
 		File dbPath=new File(configFile.getParent()+File.separator+"db");
 		
 		
 		try{
 			if(!dbPath.exists()|| !configFile.exists()){
-				//如果要初始化
-				if(initFlag){
-					String db=initConfig(dbPath,configFile);	
-					if(db!=null){
-						ConfigService.createSqliteTable(parentPath);
-					}
+				//开始初始化				
+				String db=initConfig(dbPath,configFile);	
+				if(db!=null){
+					ConfigService.createSqliteTable(parentPath);
 				}
 				
+				return true;
 			}
-			
+			return false;
 	      
-			return true;
+			
 			
 		}catch(Exception e){
 			log.error(e.getMessage(),e);
@@ -97,11 +101,11 @@ public class ConfigService {
 		conn.close();
 	}
 
-	public static String getDbPath(String configPath) {
-		return "jdbc:sqlite:/" + configPath + "/" + "methodstatis" + "/db"
-				+ "/" + "highersort.db";
+	public static String getDbPath(String tomcatPath) {
+		return "jdbc:sqlite:/" + tomcatPath + "/" + "methodstatis" + "/db"
+				+ "/" + "highersoft.db";
 	}
-	public static String getConfigPath(String configPath) {
-		return configPath+File.separator+"methodstatis"+File.separator+"methodstatis.properties";
+	public static String getConfigPath(String tomcatPath) {
+		return tomcatPath+File.separator+"methodstatis"+File.separator+"methodstatis.properties";
 	}
 }

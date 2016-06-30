@@ -7,14 +7,10 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 
 import net.highersoft.mstats.service.ActionMethodService;
-import net.highersoft.mstats.service.ConfigService;
-import net.sf.json.JSONObject;
-import net.sf.json.util.JSONUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -40,10 +36,12 @@ public class MethodStatisAction {
 	
 	
 	
-	public Object process(String fullUrl,String configPath,HttpServletRequest request){
+	public Object process(String fullUrl,String configPath,HttpServletRequest request) throws Exception{
 		if("/query.json".equals(fullUrl)){
+			Map<String,Object> retMap=query(request);
 			
-			return  query(request);
+			return  retMap;
+			
 		}else{
 			log.info("未知请求:fullUrl:"+fullUrl);
 			return "未知请求";

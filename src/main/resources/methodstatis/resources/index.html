@@ -98,7 +98,6 @@ function initChart(viewData){
 
 
 
-
 /*
 获取表格数据
 */
@@ -115,6 +114,7 @@ function queryChartData(){
 			var configPath=rstdata["configPath"];
 			$("#dbPath").html(dbPath);
 			$("#configPath").html(configPath);
+			$("#initInfo").html(rstdata["initInfo"]);
 			
 			rstdata=rstdata["data"];
 			
@@ -129,6 +129,8 @@ function queryChartData(){
         		setWebInputs(rstdata);
     			
 			}
+			
+			
 			
 		},
 		error : function(data, status, e) {
@@ -165,6 +167,7 @@ jQuery(document).ready(function(){
     	<div class="row-fluid">
     		<br/>
     		<div class="span12">
+    		<div id="initInfo" style="color:red"></div>
     		数据库路径<span id="dbPath"></span><br/>
     		配置路径<span id="configPath"></span>
     		</div>

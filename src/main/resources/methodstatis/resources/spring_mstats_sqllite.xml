@@ -54,9 +54,12 @@
     <!-- 目标数据源配置 正式环境中可去掉，然后注入真实的目标数据库 -->
 	<bean id="mstats_tgtDataSource" class="org.apache.commons.dbcp.BasicDataSource">
 		<property name="driverClassName" value="org.sqlite.JDBC" />
+		<!-- 系统启动时，动态指定 -->
+		<!-- 
 		<property name="url" >
 		<value><![CDATA[jdbc:sqlite:${sqlite.path}]]></value>
 		</property>
+		 -->
 	</bean>
     
 	

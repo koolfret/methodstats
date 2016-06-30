@@ -17,6 +17,7 @@ package net.highersoft.mstats.servlet;
 
 
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -56,9 +57,9 @@ public   class ResourceServlet extends HttpServlet {
     //数据库路径
     private String dbPath;
     //配置文件路径
-    private String configPath;
-    
-
+    private static String configPath;
+    //本次启动是否执行了初始化
+    private   boolean initThisTime=false;
     private MethodStatisAction methodStatisAction;
     /*public ResourceServlet(){
     	 try {    	
@@ -69,6 +70,10 @@ public   class ResourceServlet extends HttpServlet {
 		}
     }*/
     
+   
+    public static String getConfigPath(){
+    	return configPath;
+    }
     
 	
     @Override
@@ -83,6 +88,9 @@ public   class ResourceServlet extends HttpServlet {
 
     private void initAuthEnv(ServletConfig config) throws FileNotFoundException {
     	this.parentPath=config.getInitParameter("configPath");
+    	if(StringUtils.isBlank(this.parentPath) ||!new File(this.parentPath).exists()){
+    		this.parentPath=System.getProperty("catalina.base");
+    	}
         if(StringUtils.isBlank(parentPath)){
         	log.error("web.xml中配置的ResourceServlet的configPath参数为空!");
         	throw new RuntimeException("配置错误");
@@ -94,7 +102,7 @@ public   class ResourceServlet extends HttpServlet {
         datas.setUrl(ConfigService.getDbPath(parentPath));        
         
         //检查配置
-        ConfigService.checkConfig(true,parentPath);
+        initThisTime=ConfigService.checkConfig(parentPath);
         dbPath=ConfigService.getDbPath(parentPath);
         configPath=ConfigService.getConfigPath(parentPath);
         
@@ -173,8 +181,16 @@ public   class ResourceServlet extends HttpServlet {
                 fullUrl += "?" + request.getQueryString();
             }
            // response.getWriter().print(process(fullUrl));
-            Object obj=methodStatisAction.process(fullUrl,parentPath,request);
+            Object obj=null;
+            try{
+            	obj=methodStatisAction.process(fullUrl,parentPath,request);
+            }catch(Exception e){
+            	log.error(e.getMessage(),e);
+            }
             jsonObj.put("data", obj);
+            if(initThisTime){
+            	jsonObj.put("initInfo", "本次启动执行了初始化程序,请编辑"+ResourceServlet.getConfigPath()+"文件设置过滤的URL和功能名.如:/methodstatis/GameAction!personalIncome.action=个人所得税");
+			}
             jsonObj.put("dbPath", dbPath);
             jsonObj.put("configPath", configPath);
             response.getWriter().print(jsonObj);
