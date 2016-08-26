@@ -27,3 +27,19 @@ java web项目方法调用次数统计组件
 	</servlet-mapping>
 	</code></pre>
 3.访问http://yoursite/methodstatis/index.html	
+
+4.实现说明
+j2ee容器(tomcat)启动时,会加载组件里的spring配置,本组件使用的默认数据库是sqllite,configPath的值就是数据库文件路径。
+${configPath}/methodstatis/methodstatis.properties里配置需统计的路径。这个路径需要在配置相应的拦截器，如struts的如下配置:
+<pre><code>
+		<!-- 访问统计 -->
+		<interceptors>
+			<interceptor name="mstats" class="net.highersoft.mstats.interceptor.ActionMethodInterceptor" />
+	       	
+			<interceptor-stack name="mstatsSecurityInterceptor">				
+				<interceptor-ref name="mstats" />				 
+				
+			</interceptor-stack>
+		</interceptors>
+		<default-interceptor-ref name="mstatsSecurityInterceptor" />
+</code></pre>	
