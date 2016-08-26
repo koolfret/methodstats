@@ -6,12 +6,13 @@ java web项目方法调用次数统计组件
 	<dependency>
 		<groupId>net.highersoft</groupId>
 		<artifactId>methodstatis</artifactId>
-		<version>0.0.1</version>
+		<version>1.0.0</version>
 	</dependency>
 	</code></pre>
 	
+	
 2.在web.xml里配置，注意configPath是你存放数据库文件的路径
-	<pre><code>
+		<pre><code>
 	<servlet>
 		<servlet-name>methodstatis</servlet-name>
 		<servlet-class>net.highersoft.mstats.servlet.ResourceServlet</servlet-class>
