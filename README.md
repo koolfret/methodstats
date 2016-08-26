@@ -2,7 +2,7 @@
 java web项目方法调用次数统计组件
 
 1.在pom.xml里添加依赖    
-       ```xml  
+       ```
 	<dependency>
 		<groupId>net.highersoft</groupId>
 		<artifactId>methodstatis</artifactId>
