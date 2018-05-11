@@ -1,11 +1,7 @@
 package net.highersoft.mstats.service;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
@@ -15,7 +11,7 @@ import org.apache.commons.logging.LogFactory;
 
 public class ConfigService {
 	private static Log log=LogFactory.getLog(ConfigService.class);
-	public static String  initConfig(File dbPath,File configFile) throws IOException{		
+	private static String  initConfig(File dbPath,File configFile) throws IOException{		
 		if(!dbPath.exists()){
 			dbPath.mkdirs();	
 			if(!configFile.exists()){
@@ -37,15 +33,19 @@ public class ConfigService {
 	 * @param parentPath
 	 * @return 是否执行了初始化
 	 */
-	public static boolean checkConfig(String parentPath) {		
+	public static boolean initFolderDB(String parentPath) {
+		File parentFile=new File(parentPath);
+		if(!parentFile.exists()) {
+			parentFile.mkdirs();
+		}
 		File configFile=new File(getConfigPath(parentPath));
-		File dbPath=new File(configFile.getParent()+File.separator+"db");
+		File dbFolder=new File(configFile.getParent()+File.separator+"db");
 		
 		
 		try{
-			if(!dbPath.exists()|| !configFile.exists()){
+			if(!dbFolder.exists()|| !configFile.exists()){
 				//开始初始化				
-				String db=initConfig(dbPath,configFile);	
+				String db=initConfig(dbFolder,configFile);	
 				if(db!=null){
 					ConfigService.createSqliteTable(parentPath);
 				}
@@ -101,11 +101,11 @@ public class ConfigService {
 		conn.close();
 	}
 
-	public static String getDbPath(String tomcatPath) {
-		return "jdbc:sqlite:/" + tomcatPath + "/" + "methodstatis" + "/db"
+	public static String getDbPath(String parentPath) {
+		return "jdbc:sqlite:/" + parentPath + "/db"
 				+ "/" + "highersoft.db";
 	}
-	public static String getConfigPath(String tomcatPath) {
-		return tomcatPath+File.separator+"methodstatis"+File.separator+"methodstatis.properties";
+	public static String getConfigPath(String parentPath) {
+		return parentPath+File.separator+"methodstatis.properties";
 	}
 }

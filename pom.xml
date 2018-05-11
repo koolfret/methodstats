@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>net.highersoft</groupId>
   <artifactId>methodstatis</artifactId>
-  <version>1.0.0</version>
+  <version>1.1.1</version>
    <properties>
   		<spring.version>3.0.5.RELEASE</spring.version>
 		<struts.version>2.3.15.1</struts.version>
@@ -139,6 +139,21 @@
 				</dependency>
 			 -->
   </dependencies>
+  
+  <distributionManagement>
+		<repository>
+			<id>highersoft-releases</id>
+			<name>highersoft Project Release</name>
+			<url>http://www.highersoft.net:8081/nexus/content/repositories/releases/</url>
+		</repository>
+
+
+		<snapshotRepository>
+			<id>fanqihighersofte-snapshots</id>
+			<name>highersoft Project SNAPSHOTS</name>
+			<url>http://www.highersoft.net:8081/nexus/content/repositories/snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
   	<profiles>
 		<profile>
 			<id>PRODUCTION</id>

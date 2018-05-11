@@ -20,8 +20,8 @@ public class VisitorDataProcessor extends Thread{
     
     public VisitorDataProcessor() {
 		super();		
-		this.start();
-		log.info("Visitor 线程启动...");
+//		this.start();
+//		log.info("Visitor 线程启动...");
 		
 	}
    

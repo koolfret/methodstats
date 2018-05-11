@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.highersoft.mstats.service.ActionMethodService;
 import net.highersoft.mstats.service.ConfigService;
+import net.highersoft.mstats.service.VisitorDataProcessor;
 import net.highersoft.mstats.util.Utils;
 import net.sf.json.JSONObject;
 
@@ -53,11 +54,11 @@ public   class ResourceServlet extends HttpServlet {
  
     public static ClassPathXmlApplicationContext context=new ClassPathXmlApplicationContext("/methodstatis/resources/spring_mstats_sqllite.xml"); 
     protected  String     resourcePath="methodstatis/resources";
-    private String parentPath;
+    //private String parentPath;
     //数据库路径
-    private String dbPath;
+    //private String dbPath;
     //配置文件路径
-    private static String configPath;
+    private static String configParentPath;
     //本次启动是否执行了初始化
     private   boolean initThisTime=false;
     private MethodStatisAction methodStatisAction;
@@ -71,8 +72,8 @@ public   class ResourceServlet extends HttpServlet {
     }*/
     
    
-    public static String getConfigPath(){
-    	return configPath;
+    public static String getConfigParentPath(){
+    	return configParentPath;
     }
     
 	
@@ -87,14 +88,22 @@ public   class ResourceServlet extends HttpServlet {
     }
 
     private void initAuthEnv(ServletConfig config) throws FileNotFoundException {
-    	this.parentPath=config.getInitParameter("configPath");
-    	if(StringUtils.isBlank(this.parentPath) ||!new File(this.parentPath).exists()){
-    		this.parentPath=System.getProperty("catalina.base");
+    	String parentPath=config.getInitParameter("configPath");
+    	if(StringUtils.isBlank(parentPath) ||!new File(parentPath).exists()){
+    		parentPath=System.getProperty("catalina.base")+File.separator+"methodstatis";
     	}
         if(StringUtils.isBlank(parentPath)){
+        	
         	log.error("web.xml中配置的ResourceServlet的configPath参数为空!");
         	throw new RuntimeException("配置错误");
         }
+        //如果parentPath为空，初始化文件结构与数据库
+        File parentFile=new File(parentPath);
+        if(!parentFile.exists()) {
+        	ConfigService.initFolderDB(parentPath);
+        }
+        		
+        
         //读配置
         MethodStatisAction ma=context.getBean(MethodStatisAction.class);
         methodStatisAction=ma;
@@ -102,12 +111,12 @@ public   class ResourceServlet extends HttpServlet {
         datas.setUrl(ConfigService.getDbPath(parentPath));        
         
         //检查配置
-        initThisTime=ConfigService.checkConfig(parentPath);
-        dbPath=ConfigService.getDbPath(parentPath);
-        configPath=ConfigService.getConfigPath(parentPath);
+        //initThisTime=ConfigService.checkConfig(parentPath);
+        String dbPath=ConfigService.getDbPath(parentPath);
+        String methodConfigPath=ConfigService.getConfigPath(parentPath);
         
         //设置拦截路径
-    	InputStream in = new FileInputStream(configPath);
+    	InputStream in = new FileInputStream(methodConfigPath);
     	Properties props = new Properties();
 		try {			
 			props.load(new InputStreamReader(in,"UTF-8"));
@@ -120,6 +129,10 @@ public   class ResourceServlet extends HttpServlet {
         	paths.put(String.valueOf(key), props.getProperty(String.valueOf(key)));
         }
         ActionMethodService.setPathInfo(paths);
+        
+        VisitorDataProcessor processor=context.getBean(VisitorDataProcessor.class);
+        processor.start();
+		log.info("Visitor 线程启动...");
         
     }
 
@@ -183,16 +196,16 @@ public   class ResourceServlet extends HttpServlet {
            // response.getWriter().print(process(fullUrl));
             Object obj=null;
             try{
-            	obj=methodStatisAction.process(fullUrl,parentPath,request);
+            	obj=methodStatisAction.process(fullUrl,configParentPath,request);
             }catch(Exception e){
             	log.error(e.getMessage(),e);
             }
             jsonObj.put("data", obj);
             if(initThisTime){
-            	jsonObj.put("initInfo", "本次启动执行了初始化程序,请编辑"+ResourceServlet.getConfigPath()+"文件设置过滤的URL和功能名.如:/methodstatis/GameAction!personalIncome.action=个人所得税");
+            	jsonObj.put("initInfo", "本次启动执行了初始化程序,请编辑"+ResourceServlet.getConfigParentPath()+"文件设置过滤的URL和功能名.如:/methodstatis/GameAction!personalIncome.action=个人所得税");
 			}
-            jsonObj.put("dbPath", dbPath);
-            jsonObj.put("configPath", configPath);
+            jsonObj.put("dbPath", ConfigService.getDbPath(configParentPath));
+            jsonObj.put("configPath", ConfigService.getConfigPath(configParentPath));
             response.getWriter().print(jsonObj);
             return;
         }
