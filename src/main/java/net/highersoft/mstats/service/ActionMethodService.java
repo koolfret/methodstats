@@ -95,7 +95,7 @@ public class ActionMethodService {
    
     public void putVisitData(String erpId,String menuPath)
     {
-        if(StringUtils.isNotBlank(erpId)&&StringUtils.isNotBlank(menuPath))
+        if(StringUtils.isNotBlank(menuPath))
         {
         	//如果不是记录全部，并且不在配置范围内则退出
         	if(!recordAll&&!pathInfo.containsKey(menuPath)){

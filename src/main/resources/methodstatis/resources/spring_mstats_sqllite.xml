@@ -37,7 +37,7 @@
     
     <bean id="mstatsService" class="net.highersoft.mstats.service.ActionMethodService">
     	<!--recordAll true记录全部，false只记录下面配置的  -->
-    	<property name="recordAll" value="false"/>
+    	<property name="recordAll" value="true"/>
     	<!-- 
     	<property name="sysId" value="1"/>
      	<property name="sysName" value="HigherSoft"/>

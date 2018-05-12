@@ -34,17 +34,17 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.highersoft.mstats.service.ActionMethodService;
-import net.highersoft.mstats.service.ConfigService;
-import net.highersoft.mstats.service.VisitorDataProcessor;
-import net.highersoft.mstats.util.Utils;
-import net.sf.json.JSONObject;
-
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import net.highersoft.mstats.service.ActionMethodService;
+import net.highersoft.mstats.service.ConfigService;
+import net.highersoft.mstats.service.VisitorDataProcessor;
+import net.highersoft.mstats.util.Utils;
+import net.sf.json.JSONObject;
 
 public   class ResourceServlet extends HttpServlet {
 
@@ -70,11 +70,11 @@ public   class ResourceServlet extends HttpServlet {
 			log.error(e.getMessage(),e);
 		}
     }*/
-    
-   
-    public static String getConfigParentPath(){
-    	return configParentPath;
+    public static<T> T getBean(Class<T> cls){
+    	return context.getBean(cls);
     }
+   
+    
     
 	
     @Override
@@ -88,19 +88,19 @@ public   class ResourceServlet extends HttpServlet {
     }
 
     private void initAuthEnv(ServletConfig config) throws FileNotFoundException {
-    	String parentPath=config.getInitParameter("configPath");
-    	if(StringUtils.isBlank(parentPath) ||!new File(parentPath).exists()){
-    		parentPath=System.getProperty("catalina.base")+File.separator+"methodstatis";
+    	configParentPath=config.getInitParameter("configPath");
+    	if(StringUtils.isBlank(configParentPath) ||!new File(configParentPath).exists()){
+    		configParentPath=System.getProperty("catalina.base")+File.separator+"methodstatis";
     	}
-        if(StringUtils.isBlank(parentPath)){
+        if(StringUtils.isBlank(configParentPath)){
         	
         	log.error("web.xml中配置的ResourceServlet的configPath参数为空!");
         	throw new RuntimeException("配置错误");
         }
         //如果parentPath为空，初始化文件结构与数据库
-        File parentFile=new File(parentPath);
+        File parentFile=new File(configParentPath);
         if(!parentFile.exists()) {
-        	ConfigService.initFolderDB(parentPath);
+        	ConfigService.initFolderDB(configParentPath);
         }
         		
         
@@ -108,12 +108,12 @@ public   class ResourceServlet extends HttpServlet {
         MethodStatisAction ma=context.getBean(MethodStatisAction.class);
         methodStatisAction=ma;
         BasicDataSource datas=context.getBean(BasicDataSource.class);
-        datas.setUrl(ConfigService.getDbPath(parentPath));        
+        datas.setUrl(ConfigService.getDbPath(configParentPath));        
         
         //检查配置
         //initThisTime=ConfigService.checkConfig(parentPath);
-        String dbPath=ConfigService.getDbPath(parentPath);
-        String methodConfigPath=ConfigService.getConfigPath(parentPath);
+        String dbPath=ConfigService.getDbPath(configParentPath);
+        String methodConfigPath=ConfigService.getConfigPath(configParentPath);
         
         //设置拦截路径
     	InputStream in = new FileInputStream(methodConfigPath);
@@ -202,7 +202,7 @@ public   class ResourceServlet extends HttpServlet {
             }
             jsonObj.put("data", obj);
             if(initThisTime){
-            	jsonObj.put("initInfo", "本次启动执行了初始化程序,请编辑"+ResourceServlet.getConfigParentPath()+"文件设置过滤的URL和功能名.如:/methodstatis/GameAction!personalIncome.action=个人所得税");
+            	jsonObj.put("initInfo", "本次启动执行了初始化程序,请编辑"+configParentPath+"文件设置过滤的URL和功能名.如:/methodstatis/GameAction!personalIncome.action=个人所得税");
 			}
             jsonObj.put("dbPath", ConfigService.getDbPath(configParentPath));
             jsonObj.put("configPath", ConfigService.getConfigPath(configParentPath));
